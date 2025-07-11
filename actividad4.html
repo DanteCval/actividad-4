@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>MiCatálogoSeguro - Actividad 4</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://api.openweathermap.org;">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1> MiCatálogo</h1>
+
+  <!--  1. Validación en cliente -->
+  <h2>Login</h2>
+  <form id="login-form">
+    <label>Usuario: <input type="text" id="usuario" required></label><br>
+    <label>Contraseña: <input type="password" id="clave" minlength="8" required></label><br>
+    <button type="submit">Iniciar sesión</button>
+  </form>
+  <p id="login-msg"></p>
+
+  <!--  2. Resultado del token (simulado) -->
+  <h3>Token generado:</h3>
+  <pre id="token"></pre>
+
+  <!-- 3. API REST simulada -->
+  <h2> Productos disponibles</h2>
+  <button onclick="cargarProductos()">Ver productos</button>
+  <ul id="productos"></ul>
+
+  <!--  4. API pública (clima) -->
+  <h2>☁️ Clima en México</h2>
+  <button onclick="obtenerClima()">Consultar clima</button>
+  <p id="clima"></p>
+
+  <script>
+    //  Validación y autenticación (simulada)
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const usuario = document.getElementById('usuario').value;
+      const clave = document.getElementById('clave').value;
+
+      if (usuario === 'admin' && clave === '12345678') {
+        const token = btoa(`${usuario}:${clave}`); // Simulación de token
+        document.getElementById('token').textContent = token;
+        document.getElementById('login-msg').textContent = "Login exitoso.";
+      } else {
+        document.getElementById('login-msg').textContent = "Credenciales inválidas.";
+      }
+    });
+
+    //  API REST simulada
+    function cargarProductos() {
+      const productos = [
+        { id: 1, nombre: 'Guitarra eléctrica', precio: 5000 },
+        { id: 2, nombre: 'Bajo activo', precio: 4500 }
+      ];
+      const ul = document.getElementById('productos');
+      ul.innerHTML = '';
+      productos.forEach(p => {
+        const li = document.createElement('li');
+        li.textContent = `${p.nombre} - $${p.precio}`;
+        ul.appendChild(li);
+      });
+    }
+
+    //  API pública real - OpenWeatherMap
+    function obtenerClima() {
+      fetch('https://api.openweathermap.org/data/2.5/weather?q=Mexico&appid=29512d4de5cd49bf8c0cf56f31caa7de&units=metric&lang=es')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('clima').textContent =
+            `El clima actual es: ${data.weather[0].description}, ${data.main.temp}°C`;
+        })
+        .catch(err => {
+          document.getElementById('clima').textContent = "Error al obtener clima.";
+        });
+    }
+  </script>
+</body>
+</html>
